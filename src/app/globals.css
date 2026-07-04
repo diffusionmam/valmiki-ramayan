@@ -141,23 +141,64 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Anchor jumps clear the sticky header. */
+    scroll-padding-top: 5rem;
   }
   html {
     @apply font-sans scroll-smooth;
+    scroll-padding-top: 5rem;
   }
+  /* Ensure in-page anchors land below the sticky header. */
+  [id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* ── Paper-grain texture (site-wide, dependency-free) ────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark body::before {
+  opacity: 0.06;
+  mix-blend-mode: overlay;
 }
 
 /* ── Sanskrit Verse Typography ───────────────────────────────── */
 .verse-sanskrit {
   font-family: "Noto Serif Devanagari", "Noto Serif", Georgia, serif;
-  font-size: 1.2rem;
-  line-height: 2;
-  letter-spacing: 0.02em;
+  font-size: 1.3rem;
+  line-height: 2.1;
+  letter-spacing: 0.025em;
   color: var(--saffron-dark);
 }
 
 .dark .verse-sanskrit {
   color: var(--saffron);
+}
+
+/* Manuscript rule beneath each shloka — a faint horizontal guide line. */
+.verse-sanskrit::after {
+  content: "";
+  display: block;
+  margin: 0.75rem auto 0;
+  width: 60%;
+  max-width: 14rem;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--saffron) 30%,
+    var(--saffron) 70%,
+    transparent
+  );
+  opacity: 0.4;
 }
 
 .verse-meaning {
@@ -171,12 +212,217 @@
   color: var(--foreground);
 }
 
-/* ── Decorative Divider ──────────────────────────────────────── */
+/* ── IAST Transliteration ────────────────────────────────────── */
+.verse-itrans {
+  font-family: "Noto Serif", Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  color: var(--muted-foreground);
+  font-style: italic;
+  white-space: pre-line;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.dark .verse-itrans {
+  color: var(--muted-foreground);
+  opacity: 0.85;
+}
+
+/* ── Manuscript Plaque ───────────────────────────────────────── */
+.verse-plaque {
+  position: relative;
+  border-radius: 0.75rem;
+  background: color-mix(in oklch, var(--saffron) 5%, transparent);
+  padding: 1.5rem 1.25rem 1.25rem;
+  text-align: center;
+}
+
+.dark .verse-plaque {
+  background: color-mix(in oklch, var(--saffron) 7%, transparent);
+}
+
+/* Faint corner flourishes on the plaque */
+.verse-plaque::before,
+.verse-plaque::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--saffron);
+  opacity: 0.25;
+}
+.verse-plaque::before {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+}
+.verse-plaque::after {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 4px;
+}
+
+/* ── Ornamented Commentary <details> ─────────────────────────── */
+.commentary-toggle {
+  cursor: pointer;
+  list-style: none;
+}
+.commentary-toggle::-webkit-details-marker {
+  display: none;
+}
+.commentary-toggle summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  transition: color 0.2s;
+}
+.commentary-toggle summary:hover {
+  color: var(--foreground);
+}
+.commentary-toggle summary svg {
+  transition: transform 0.2s;
+}
+.commentary-toggle[open] summary svg {
+  transform: rotate(90deg);
+}
+.commentary-body {
+  margin-top: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--saffron);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: color-mix(in oklch, var(--saffron) 4%, transparent);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+}
+
+/* ── Verse section label ─────────────────────────────────────── */
+.verse-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.verse-label::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  opacity: 0.5;
+}
+
+/* ── Reading Progress Bar ────────────────────────────────────── */
+.reading-progress {
+  position: fixed;
+  top: 4rem; /* below the 4rem (h-16) sticky header */
+  left: 0;
+  height: 3px;
+  z-index: 60; /* above the z-50 header */
+  background: linear-gradient(
+    to right,
+    var(--saffron-dark),
+    var(--saffron)
+  );
+  box-shadow: 0 1px 4px oklch(0.72 0.16 65 / 30%);
+  transition: width 0.1s linear;
+  will-change: width;
+  border-radius: 0 2px 2px 0;
+}
+.reading-progress.reduced {
+  transition: none;
+}
+
+/* ── SargaRail ───────────────────────────────────────────────── */
+.sarga-rail {
+  position: sticky;
+  top: 5rem;
+  align-self: start;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+/* Active verse highlight in the rail */
+.rail-verse-link {
+  transition: all 0.15s;
+}
+.rail-verse-link.active {
+  color: var(--kanda-accent, var(--saffron));
+  font-weight: 600;
+}
+
+/* ── Kaanda Accent System ────────────────────────────────────── */
+/* Each kanda carries an atmospheric accent used on its surfaces.   */
+:root {
+  --kanda-bala: oklch(0.72 0.15 68);
+  --kanda-ayodhya: oklch(0.50 0.13 255);
+  --kanda-aranya: oklch(0.52 0.11 150);
+  --kanda-kishkindha: oklch(0.58 0.12 55);
+  --kanda-sundara: oklch(0.55 0.12 210);
+  --kanda-yuddha: oklch(0.52 0.18 25);
+}
+.dark {
+  --kanda-bala: oklch(0.78 0.13 70);
+  --kanda-ayodhya: oklch(0.62 0.11 255);
+  --kanda-aranya: oklch(0.62 0.10 150);
+  --kanda-kishkindha: oklch(0.68 0.11 55);
+  --kanda-sundara: oklch(0.66 0.11 210);
+  --kanda-yuddha: oklch(0.64 0.16 25);
+}
+
+/* Utility: set --kanda-accent on a wrapper, children inherit. */
+.kanda-accent {
+  --kanda-accent: var(--saffron);
+}
+
+/* Per-kanda accent classes — used instead of inline custom properties
+   so browser extensions (e.g. Dark Reader) can't inject into them. */
+.kanda-bala { --kanda-accent: var(--kanda-bala); }
+.kanda-ayodhya { --kanda-accent: var(--kanda-ayodhya); }
+.kanda-aranya { --kanda-accent: var(--kanda-aranya); }
+.kanda-kishkindha { --kanda-accent: var(--kanda-kishkindha); }
+.kanda-sundara { --kanda-accent: var(--kanda-sundara); }
+.kanda-yuddha { --kanda-accent: var(--kanda-yuddha); }
+
+/* Accent-colored glyph + accent bar, driven by --kanda-accent. */
+.kanda-glyph-color {
+  color: var(--kanda-accent);
+}
+.kanda-accent-bar {
+  background: var(--kanda-accent);
+}
+.kanda-accent-wash {
+  background-image: linear-gradient(
+    160deg,
+    color-mix(in oklch, var(--kanda-accent) 8%, transparent),
+    transparent 60%
+  );
+}
+
+/* ── Decorative Dividers ─────────────────────────────────────── */
 .ornament-divider {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   margin: 2rem 0;
+  color: var(--saffron);
 }
 
 .ornament-divider::before,
@@ -190,28 +436,78 @@
     var(--saffron),
     transparent
   );
+  opacity: 0.6;
 }
 
-/* ── Gradient Hero ───────────────────────────────────────────── */
+/* Legacy class retained for existing markup. */
+.ornament-divider-plain {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+/* ── Atmospheric Hero ────────────────────────────────────────── */
 .hero-gradient {
-  background: linear-gradient(
-    135deg,
-    oklch(0.45 0.12 45 / 8%) 0%,
-    oklch(0.72 0.16 65 / 12%) 50%,
-    oklch(0.45 0.12 45 / 6%) 100%
-  );
+  --hero-glow: oklch(0.72 0.16 65 / 14%);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, var(--hero-glow), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, oklch(0.60 0.10 80 / 8%), transparent 60%),
+    linear-gradient(180deg, oklch(0.99 0.006 75) 0%, oklch(0.95 0.018 72) 100%);
 }
 
 .dark .hero-gradient {
-  background: linear-gradient(
-    135deg,
-    oklch(0.72 0.16 65 / 8%) 0%,
-    oklch(0.45 0.12 45 / 12%) 50%,
-    oklch(0.72 0.16 65 / 6%) 100%
-  );
+  --hero-glow: oklch(0.72 0.16 65 / 12%);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, var(--hero-glow), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, oklch(0.45 0.12 45 / 14%), transparent 60%),
+    linear-gradient(180deg, oklch(0.13 0.012 40) 0%, oklch(0.16 0.016 40) 100%);
 }
 
-/* ── Animations ──────────────────────────────────────────────── */
+/* Per-kanda hero glow variants. Apply alongside `.hero-gradient`. */
+.hero-gradient[data-kanda="bala"] { --hero-glow: oklch(0.72 0.15 68 / 18%); }
+.hero-gradient[data-kanda="ayodhya"] { --hero-glow: oklch(0.50 0.13 255 / 16%); }
+.hero-gradient[data-kanda="aranya"] { --hero-glow: oklch(0.52 0.11 150 / 16%); }
+.hero-gradient[data-kanda="kishkindha"] { --hero-glow: oklch(0.58 0.12 55 / 18%); }
+.hero-gradient[data-kanda="sundara"] { --hero-glow: oklch(0.55 0.12 210 / 16%); }
+.hero-gradient[data-kanda="yuddha"] { --hero-glow: oklch(0.52 0.18 25 / 18%); }
+
+/* ── On-scroll Reveal (dependency-free) ──────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-offset, 18px));
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Without JS, reveal content must stay visible (progressive enhancement). */
+.no-js .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ── Glyph Draw-on-reveal ────────────────────────────────────── */
+.glyph-draw path,
+.glyph-draw circle,
+.glyph-draw line {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glyph-draw.is-visible path,
+.glyph-draw.is-visible circle,
+.glyph-draw.is-visible line {
+  stroke-dashoffset: 0;
+}
+
+/* ── Entrance Animations (kept for existing usage) ───────────── */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -221,11 +517,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }
 
 .animate-fade-up {
@@ -242,4 +533,31 @@
 
 .animate-fade-up-delay-3 {
   animation: fade-up 0.6s ease-out 0.3s both;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .glyph-draw path,
+  .glyph-draw circle,
+  .glyph-draw line {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+  .animate-fade-up,
+  .animate-fade-up-delay-1,
+  .animate-fade-up-delay-2,
+  .animate-fade-up-delay-3 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
 }

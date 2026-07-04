@@ -34,7 +34,7 @@ export default function AuthorsIndexPage() {
         {authors.map((author) => (
           <Link
             key={author.slug}
-            href={`/authors/${author.slug}`}
+            href={`/authors/${author.slug}/`}
             className="block"
           >
             <Card className="h-full border-border/60 transition-all hover:border-saffron/30 hover:shadow-md">

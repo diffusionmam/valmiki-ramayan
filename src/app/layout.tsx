@@ -5,6 +5,15 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
 
+// Apply the stored theme before paint to avoid a flash of incorrect theme.
+const themeInitScript = `
+(function(){try{
+  var s=localStorage.getItem('theme');
+  var m=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(s==='dark'||(!s&&m)){document.documentElement.classList.add('dark');}
+}catch(e){}})();
+`;
+
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -52,6 +61,18 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* Progressive enhancement: mark JS as enabled so reveal animations run. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js');",
+          }}
+        />
+        <noscript>
+          <style>{`.reveal{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <Header />
         <main className="flex-1">{children}</main>

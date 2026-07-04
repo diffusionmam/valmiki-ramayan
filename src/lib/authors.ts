@@ -1,4 +1,5 @@
 import type { Author } from "./types";
+import { KANDA_META } from "./kanda-meta";
 
 export const AUTHORS: Record<string, Author> = {
   "desiraju-hanumanta-rao": {
@@ -49,21 +50,12 @@ export function getAuthor(slug: string): Author | null {
 }
 
 export function getKandaNameForAuthor(slug: string): Record<string, string> {
-  const kandaNames: Record<string, string> = {
-    bala: "Bala Kanda",
-    ayodhya: "Ayodhya Kanda",
-    aranya: "Aranya Kanda",
-    kishkindha: "Kishkindha Kanda",
-    sundara: "Sundara Kanda",
-    yuddha: "Yuddha Kanda",
-  };
-
   const author = AUTHORS[slug];
   if (!author) return {};
 
   return author.translatedKandas.reduce(
     (acc, kandaSlug) => {
-      acc[kandaSlug] = kandaNames[kandaSlug] || kandaSlug;
+      acc[kandaSlug] = KANDA_META[kandaSlug]?.name ?? kandaSlug;
       return acc;
     },
     {} as Record<string, string>

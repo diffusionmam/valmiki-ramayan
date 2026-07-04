@@ -2,14 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { KANDA_META, KANDA_SLUGS } from "@/lib/kanda-meta";
+import type { KandaSlug } from "@/lib/kanda-meta";
+import { KandaGlyph } from "@/components/KandaGlyph";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [kandaOpen, setKandaOpen] = useState(false);
+  const kandaRef = useRef<HTMLDivElement>(null);
+
+  // Close the kanda dropdown on outside click or Escape.
+  useEffect(() => {
+    if (!kandaOpen) return;
+    function onPointer(e: PointerEvent) {
+      if (kandaRef.current && !kandaRef.current.contains(e.target as Node)) {
+        setKandaOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setKandaOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [kandaOpen]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -19,9 +43,7 @@ export function Header() {
           href="/"
           className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
         >
-          <span className="text-2xl" aria-hidden>
-            🙏
-          </span>
+          <OmMark className="h-7 w-7 text-saffron" />
           <div className="flex flex-col">
             <span className="font-heading text-lg font-bold leading-tight text-primary">
               Valmiki Ramayana
@@ -44,40 +66,66 @@ export function Header() {
             Home
           </Link>
 
-          {/* Kanda Dropdown — simple CSS hover */}
-          <div className="group relative">
+          {/* Kanda dropdown — keyboard accessible */}
+          <div className="relative" ref={kandaRef}>
             <button
+              type="button"
+              onClick={() => setKandaOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={kandaOpen}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 pathname.startsWith("/kanda") && "bg-accent text-accent-foreground"
               )}
             >
-              Kaandas ▾
+              Kaandas
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={cn("transition-transform", kandaOpen && "rotate-180")}
+                suppressHydrationWarning
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
-            <div className="invisible absolute left-0 top-full z-50 min-w-[260px] rounded-xl border border-border bg-popover p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-              {KANDA_SLUGS.map((slug) => {
-                const meta = KANDA_META[slug];
-                return (
-                  <Link
-                    key={slug}
-                    href={`/kanda/${slug}`}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-accent"
-                  >
-                    <span className="text-lg">{meta.icon}</span>
-                    <div>
-                      <div className="font-medium">{meta.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {meta.nameEnglish} · {meta.sargaCount} chapters
+            {kandaOpen && (
+              <div
+                role="menu"
+                className="absolute left-0 top-full z-50 mt-1 min-w-[280px] rounded-xl border border-border bg-popover p-2 shadow-xl"
+              >
+                {KANDA_SLUGS.map((slug) => {
+                  const meta = KANDA_META[slug as KandaSlug];
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/kanda/${slug}/`}
+                      onClick={() => setKandaOpen(false)}
+                      role="menuitem"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <KandaGlyph
+                        name={meta.glyph}
+                        className="h-6 w-6 shrink-0"
+                      />
+                      <div>
+                        <div className="font-medium">{meta.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {meta.nameEnglish} · {meta.sargaCount} chapters
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <Link
-            href="/about"
+            href="/about/"
             className={cn(
               "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
               pathname === "/about" && "bg-accent text-accent-foreground"
@@ -86,7 +134,7 @@ export function Header() {
             About
           </Link>
           <Link
-            href="/resources"
+            href="/resources/"
             className={cn(
               "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
               pathname === "/resources" && "bg-accent text-accent-foreground"
@@ -94,26 +142,33 @@ export function Header() {
           >
             Resources
           </Link>
+
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden />
+
+          <ThemeToggle />
         </nav>
 
-        {/* Mobile Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-        </Button>
+        {/* Mobile controls */}
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" suppressHydrationWarning>
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" suppressHydrationWarning>
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -128,28 +183,28 @@ export function Header() {
               Home
             </Link>
             {KANDA_SLUGS.map((slug) => {
-              const meta = KANDA_META[slug];
+              const meta = KANDA_META[slug as KandaSlug];
               return (
                 <Link
                   key={slug}
-                  href={`/kanda/${slug}`}
+                  href={`/kanda/${slug}/`}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-accent"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-accent"
                 >
-                  <span>{meta.icon}</span>
+                  <KandaGlyph name={meta.glyph} className="h-5 w-5 shrink-0" />
                   {meta.name}
                 </Link>
               );
             })}
             <Link
-              href="/about"
+              href="/about/"
               onClick={() => setMobileOpen(false)}
               className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
             >
               About
             </Link>
             <Link
-              href="/resources"
+              href="/resources/"
               onClick={() => setMobileOpen(false)}
               className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
             >
@@ -159,5 +214,28 @@ export function Header() {
         </div>
       )}
     </header>
+  );
+}
+
+/** Custom Om-style mark for the logo. */
+function OmMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      suppressHydrationWarning
+      className={className}
+    >
+      {/* Stylized Om curl */}
+      <path d="M8 14 C 4 14, 4 9, 9 9 C 14 9, 15 14, 11 16 C 7 18, 8 23, 13 22 C 18 21, 19 15, 24 15 C 28 15, 28 20, 24 20" />
+      <path d="M22 9 C 24 7, 27 8, 27 11" />
+      <circle cx="24" cy="6" r="0.8" fill="currentColor" stroke="none" />
+      <path d="M13 22 C 14 25, 18 26, 21 24" />
+    </svg>
   );
 }

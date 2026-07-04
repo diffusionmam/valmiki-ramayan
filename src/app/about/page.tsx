@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
+import { KANDA_META, KANDA_SLUGS } from "@/lib/data";
+import type { KandaSlug } from "@/lib/kanda-meta";
+import { KandaGlyph } from "@/components/KandaGlyph";
+import { Ornament } from "@/components/Ornament";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About the Ramayana",
@@ -69,32 +74,30 @@ export default function AboutPage() {
             The Six Books
           </h2>
           <div className="grid gap-3">
-            {[
-              { num: 1, name: "Bala Kanda", eng: "Book of Youth", desc: "77 chapters covering Rama's birth, education, and marriage" },
-              { num: 2, name: "Ayodhya Kanda", eng: "Book of Ayodhya", desc: "119 chapters about the exile and Dasharatha's death" },
-              { num: 3, name: "Aranya Kanda", eng: "Book of Forest", desc: "75 chapters in the Dandaka forest, ending with Sita's abduction" },
-              { num: 4, name: "Kishkindha Kanda", eng: "Empire of Holy Monkeys", desc: "67 chapters about the Vanara alliance" },
-              { num: 5, name: "Sundara Kanda", eng: "Book of Beauty", desc: "68 chapters of Hanuman's journey to Lanka" },
-              { num: 6, name: "Yuddha Kanda", eng: "Book of War", desc: "128 chapters of the great war and Rama's coronation" },
-            ].map((book) => (
-              <div
-                key={book.num}
-                className="flex items-start gap-3 rounded-lg border border-border/50 p-4"
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                  {book.num}
-                </span>
-                <div>
-                  <p className="font-medium text-foreground">
-                    {book.name}{" "}
-                    <span className="text-sm text-muted-foreground">
-                      ({book.eng})
-                    </span>
-                  </p>
-                  <p className="text-sm text-muted-foreground">{book.desc}</p>
+            {KANDA_SLUGS.map((slug) => {
+              const book = KANDA_META[slug as KandaSlug];
+              return (
+                <div
+                  key={slug}
+                  className={cn("flex items-start gap-3 rounded-lg border border-border/50 p-4", `kanda-${slug}`)}
+                >
+                  <span className="kanda-glyph-color flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                    <KandaGlyph name={book.glyph} className="h-7 w-7" />
+                  </span>
+                  <div>
+                    <p className="font-medium text-foreground">
+                      {book.name}{" "}
+                      <span className="text-sm text-muted-foreground">
+                        ({book.nameEnglish})
+                      </span>
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {book.sargaCount} chapters — {book.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -121,7 +124,7 @@ export default function AboutPage() {
             <p className="font-heading text-lg text-saffron-dark dark:text-saffron">
               lokaabhiraamam shriiraamam bhuuyo bhuuyo namaamyaham
             </p>
-            <Separator className="mx-auto my-4 max-w-[60px] bg-saffron/30" />
+            <Ornament variant="diamond" divider className="mx-auto my-4 max-w-[120px]" />
             <p className="text-sm italic text-muted-foreground">
               &ldquo;I bow again and again to Sri Rama Who removes all
               obstacles, grants all wealth and pleases all.&rdquo;

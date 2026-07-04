@@ -89,7 +89,7 @@ export default async function AuthorPage({ params }: PageProps) {
               return (
                 <a
                   key={kandaSlug}
-                  href={`/kanda/${kandaSlug}`}
+                  href={`/kanda/${kandaSlug}/`}
                   className="flex items-start gap-3 rounded-lg border border-border/50 p-4 transition-all hover:border-saffron/30 hover:bg-accent/50"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">

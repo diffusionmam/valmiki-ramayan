@@ -15,7 +15,7 @@ export function SargaList({ kandaSlug, sargas }: SargaListProps) {
       {sargas.map((sarga, i) => (
         <Link
           key={sarga.number}
-          href={`/kanda/${kandaSlug}/sarga/${sarga.number}`}
+          href={`/kanda/${kandaSlug}/sarga/${sarga.number}/`}
           className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4 transition-all duration-200 hover:border-saffron/40 hover:bg-accent/50 hover:shadow-sm animate-fade-up"
           style={{ animationDelay: `${Math.min(i * 30, 500)}ms` }}
         >
