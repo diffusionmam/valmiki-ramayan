@@ -180,33 +180,90 @@ async function parseSargaTitles(kanda: KandaConfig): Promise<Map<number, string>
     const html = await fetchWithRetry(url);
     const root = parse(html);
 
-    // Look for links that contain sarga/chapter references
-    const links = root.querySelectorAll("a");
-    for (const link of links) {
-      const href = link.getAttribute("href") || "";
-      const text = link.text.trim();
+    if (kanda.slug === "bala") {
+      // Look for links that contain sarga/chapter references
+      const links = root.querySelectorAll("a");
+      for (const link of links) {
+        const href = link.getAttribute("href") || "";
+        const text = link.text.trim();
 
-      // Match sarga links — typically they have the sarga number in the href
-      const sargaMatch = href.match(/sarga(\d+)/);
-      if (sargaMatch && text && text.length > 3 && !text.toLowerCase().includes("sarga/chapter")) {
-        const num = parseInt(sargaMatch[1], 10);
-        if (!titles.has(num)) {
-          titles.set(num, text);
+        // Match sarga links — typically they have the sarga number in the href
+        const sargaMatch = href.match(/sarga(\d+)/);
+        if (sargaMatch && text && text.length > 3 && !text.toLowerCase().includes("sarga/chapter")) {
+          const num = parseInt(sargaMatch[1], 10);
+          if (!titles.has(num)) {
+            titles.set(num, text);
+          }
         }
       }
-    }
 
-    // Also try to extract from table rows or list items with numbers
-    const allText = root.text;
-    const numberedLines = allText.match(/(\d+)\.\s+([^\n]+)/g);
-    if (numberedLines) {
-      for (const line of numberedLines) {
-        const match = line.match(/(\d+)\.\s+(.+)/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          const title = match[2].trim();
-          if (num >= 1 && num <= kanda.sargaCount && !titles.has(num) && title.length > 3) {
-            titles.set(num, title);
+      // Also try to extract from table rows or list items with numbers
+      const allText = root.text;
+      const numberedLines = allText.match(/(\d+)\.\s+([^\n]+)/g);
+      if (numberedLines) {
+        for (const line of numberedLines) {
+          const match = line.match(/(\d+)\.\s+(.+)/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            const title = match[2].trim();
+            if (num >= 1 && num <= kanda.sargaCount && !titles.has(num) && title.length > 3) {
+              titles.set(num, title);
+            }
+          }
+        }
+      }
+    } else {
+      // Robust table-row parsing logic for other Kandas
+      const trs = root.querySelectorAll("tr");
+      for (const tr of trs) {
+        const links = tr.querySelectorAll("a");
+        let sargaNum: number | null = null;
+        let sargaLinkEl = null;
+
+        for (const link of links) {
+          const href = link.getAttribute("href") || "";
+          const match = href.match(/sarga(\d+)/i);
+          if (match) {
+            sargaNum = parseInt(match[1], 10);
+            sargaLinkEl = link;
+            break;
+          }
+        }
+
+        if (sargaNum !== null) {
+          let titleText = "";
+          const chptEl = tr.querySelector("div.chpt");
+          if (chptEl) {
+            titleText = chptEl.text.trim();
+          } else {
+            const cellText = tr.querySelector("td")?.text.trim() || "";
+            if (cellText && !cellText.toLowerCase().includes("sarga/chapter") && !cellText.toLowerCase().includes("sarga / chapter")) {
+              titleText = cellText;
+            } else {
+              for (const link of links) {
+                if (link !== sargaLinkEl) {
+                  const txt = link.text.trim();
+                  if (txt && txt.length > 2) {
+                    titleText = txt;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+          if (titleText) {
+            let cleaned = titleText
+              .replace(/&amp;/g, "&")
+              .replace(/&#39;/g, "'")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            const prefixMatch = cleaned.match(/^\d+\s*:\s*(.+)$/);
+            if (prefixMatch) {
+              cleaned = prefixMatch[1].trim();
+            }
+            titles.set(sargaNum, cleaned);
           }
         }
       }
