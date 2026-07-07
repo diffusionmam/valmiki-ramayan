@@ -11,6 +11,7 @@ interface SearchEntry {
   sarga: number;
   sargaTitle: string;
   verseNumber: string;
+  verseIndex: number;
   sanskrit: string;
   translation: string;
 }
@@ -42,6 +43,7 @@ async function loadSearchIndex(): Promise<{ search: (q: string) => SearchEntry[]
           "sarga",
           "sargaTitle",
           "verseNumber",
+          "verseIndex",
           "sanskrit",
           "translation",
         ],
@@ -124,7 +126,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       setActiveIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter" && results[activeIndex]) {
       const r = results[activeIndex];
-      window.location.href = `/kanda/${r.kanda}/sarga/${r.sarga}/#verse-${r.verseNumber}-${activeIndex}`;
+      window.location.href = `/kanda/${r.kanda}/sarga/${r.sarga}/#verse-${r.verseNumber}-${r.verseIndex}`;
     }
   }
 
@@ -188,7 +190,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
           {results.map((r, i) => (
             <Link
               key={r.id}
-              href={`/kanda/${r.kanda}/sarga/${r.sarga}/#verse-${r.verseNumber}-${i}`}
+              href={`/kanda/${r.kanda}/sarga/${r.sarga}/#verse-${r.verseNumber}-${r.verseIndex}`}
               onClick={handleClose}
               className={cn(
                 "block border-b border-border/30 px-4 py-3 transition-colors",

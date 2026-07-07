@@ -7,7 +7,7 @@
  * Usage: npx tsx scripts/scraper.ts
  */
 
-import { parse, HTMLElement } from "node-html-parser";
+import { parse } from "node-html-parser";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -156,9 +156,7 @@ function buildContentUrl(kanda: KandaConfig, sargaNum: number): string {
   return `${BASE_URL}/utf8/${kanda.dirName}/sarga${sargaNum}/${kanda.filePrefix}sans${sargaNum}.htm`;
 }
 
-function buildContentsUrl(kanda: KandaConfig): string {
-  return `${BASE_URL}/utf8/${kanda.dirName}/${kanda.dirName}_contents.htm`;
-}
+
 
 // ── Parsers ────────────────────────────────────────────────────────────
 
@@ -229,194 +227,148 @@ async function parseSargaTitles(kanda: KandaConfig): Promise<Map<number, string>
  * - English translation (often in quotes or following the meaning)
  * - Optional commentary paragraphs
  */
-function parseVerses(html: string, bookNum: number, sargaNum: number): { introduction: string; verses: Verse[] } {
-  const root = parse(html);
-  const body = root.querySelector("body") || root;
+function parseVerses(html: string, _bookNum: number, _sargaNum: number): { introduction: string; verses: Verse[] } {
+  // Fix typos where `<` is missing before `p class="..."`
+  let processedHtml = html.replace(/([^<]|^)p\s+class=["']?(pratipada|tat|SanSloka|comment)["']?>/gi, "$1<p class=\"$2\">");
+
+  // Fix unclosed opening em tags before `=`
+  processedHtml = processedHtml.replace(/<em>([^<]+?)\s*=/gi, "<em>$1</em> =");
+
+  // Pre-process HTML to fix malformed unclosed em tags
+  processedHtml = processedHtml.replace(/(\w+)<em>(\s*=)/gi, "$1</em>$2");
+  processedHtml = processedHtml.replace(/<em>\s*=/gi, "</em> =");
+
+  const root = parse(processedHtml);
 
   // Remove script tags, style tags
-  body.querySelectorAll("script, style").forEach(el => el.remove());
+  root.querySelectorAll("script, style").forEach(el => el.remove());
 
-  // Get all text content - we'll work with the raw text
-  const fullText = body.innerHTML;
-
-  // Extract introduction - typically the first large block of text before any verse
-  let introduction = "";
-  const introMatch = fullText.match(/<p[^>]*class="leading[^"]*"[^>]*>([\s\S]*?)<\/p>/i);
-  if (introMatch) {
-    const introRoot = parse(introMatch[1]);
-    introduction = introRoot.text.trim();
-  }
-
-  // If we couldn't find intro with class, try first paragraph
-  if (!introduction) {
-    const firstP = body.querySelector("p");
-    if (firstP) {
-      const text = firstP.text.trim();
-      // Only use it as introduction if it's long enough and doesn't look like a verse
-      if (text.length > 50 && !text.match(/[॥\|]\s*\d/)) {
-        introduction = text;
-      }
-    }
-  }
+  // We query p, div, td, font, span, h3, h4 from the entire root to handle elements pushed outside body due to malformed tags
+  const elements = root.querySelectorAll("p, div, td, font, span, h3, h4");
 
   const verses: Verse[] = [];
+  let currentVerse: Partial<Verse> = {};
+  let introduction = "";
+  let inIntroduction = true;
 
-  // Strategy: Split content by verse markers (Devanagari verse numbers like || १-१-१ or 1-1-1)
-  // The Devanagari text typically contains the double danda ॥ or || with verse number
+  const devanagariPattern = /[\u0900-\u097F]/;
+  const verseNumPattern = /[॥\|]{1,2}\s*(\d+-\d+-\d+)/;
+  const devanagariVerseNum = /[॥\|]{1,2}\s*([१-९][०-९]*-[१-९][०-९]*-[१-९][०-९]*)/;
 
-  // Find all paragraph/div elements and classify them
-  const elements = body.querySelectorAll("p, div, td, font, span");
-
-  let currentSanskrit = "";
-  let currentWordMeaning = "";
-  let currentTranslation = "";
-  let currentCommentary = "";
-  let currentVerseNum = "";
-  let pendingTexts: string[] = [];
-
-  function flushVerse() {
-    if (currentVerseNum && (currentSanskrit || currentTranslation)) {
-      verses.push({
-        number: currentVerseNum,
-        sanskrit: currentSanskrit.trim(),
-        wordMeaning: currentWordMeaning.trim(),
-        translation: currentTranslation.trim(),
-        commentary: currentCommentary.trim() || undefined
-      });
-    }
-    currentSanskrit = "";
-    currentWordMeaning = "";
-    currentTranslation = "";
-    currentCommentary = "";
-    currentVerseNum = "";
-    pendingTexts = [];
-  }
+  const stopKeywords = [
+    "इति वाल्मीकि",
+    "इति गायत्री"
+  ];
 
   for (const el of elements) {
+    const className = el.getAttribute("class") || "";
     const text = el.text.trim();
     if (!text || text.length < 2) continue;
 
-    // Detect Devanagari verse lines — they contain Devanagari script and verse numbers
-    // Pattern: Devanagari text followed by ॥ or || and verse number like १-१-१
-    const devanagariPattern = /[\u0900-\u097F]/;
-    const verseNumPattern = /[॥\|]{1,2}\s*(\d+-\d+-\d+)/;
-    const devanagariVerseNum = /[॥\|]{1,2}\s*([१-९][०-९]*-[१-९][०-९]*-[१-९][०-९]*)/;
-
-    if (devanagariPattern.test(text)) {
-      // This likely contains a Sanskrit verse
-      const numMatch = text.match(verseNumPattern) || text.match(devanagariVerseNum);
-      if (numMatch) {
-        // Flush previous verse
-        flushVerse();
-
-        currentVerseNum = numMatch[1];
-        // Convert Devanagari numerals if needed
-        currentVerseNum = currentVerseNum
-          .replace(/[०]/g, "0").replace(/[१]/g, "1").replace(/[२]/g, "2")
-          .replace(/[३]/g, "3").replace(/[४]/g, "4").replace(/[५]/g, "5")
-          .replace(/[६]/g, "6").replace(/[७]/g, "7").replace(/[८]/g, "8")
-          .replace(/[९]/g, "9");
-
-        currentSanskrit = text;
-      } else if (currentVerseNum && !currentSanskrit) {
-        // Additional Sanskrit text for current verse
-        currentSanskrit += " " + text;
+    // Check if this indicates the colophon / end of sarga (only if we have already entered the verses section)
+    if (!inIntroduction && stopKeywords.some(kw => text.includes(kw))) {
+      if (currentVerse.number && (currentVerse.sanskrit || currentVerse.translation)) {
+        verses.push({
+          number: currentVerse.number,
+          sanskrit: currentVerse.sanskrit || "",
+          wordMeaning: currentVerse.wordMeaning || "",
+          translation: currentVerse.translation || "",
+          commentary: currentVerse.commentary || undefined
+        });
+        currentVerse = {};
       }
+      break;
     }
-    // Detect word-by-word meaning — typically starts with a number and contains "="
-    else if (/^\d+\.\s/.test(text) && text.includes("=")) {
-      if (currentVerseNum) {
-        currentWordMeaning += (currentWordMeaning ? " " : "") + text;
+
+    // Check if this element defines a new verse number
+    const isSanskrit = className.includes("SanSloka") || devanagariPattern.test(text);
+    const numMatch = text.match(verseNumPattern) || text.match(devanagariVerseNum);
+
+    if (isSanskrit && numMatch) {
+      const rawNum = numMatch[1];
+      const cleanNum = rawNum
+        .replace(/[०]/g, "0").replace(/[१]/g, "1").replace(/[२]/g, "2")
+        .replace(/[३]/g, "3").replace(/[४]/g, "4").replace(/[५]/g, "5")
+        .replace(/[६]/g, "6").replace(/[७]/g, "7").replace(/[८]/g, "8")
+        .replace(/[९]/g, "9");
+
+      if (currentVerse.number === cleanNum) {
+        continue;
       }
-    }
-    // Detect English translation — often in quotes or follows word meaning
-    else if (currentVerseNum && text.startsWith('"') || text.startsWith('"') || text.startsWith("\"")) {
-      currentTranslation += (currentTranslation ? " " : "") + text;
-    }
-    // Detect verse number reference like [1-1-1]
-    else if (/^\[\d+-\d+-\d+\]/.test(text)) {
-      // End of translation for this verse, part of the reference
-      continue;
-    }
-    // Otherwise, if we have a current verse, this might be commentary
-    else if (currentVerseNum && currentTranslation && text.length > 20) {
-      currentCommentary += (currentCommentary ? "\n" : "") + text;
+
+      inIntroduction = false;
+
+      // Flush previous verse
+      if (currentVerse.number && (currentVerse.sanskrit || currentVerse.translation)) {
+        verses.push({
+          number: currentVerse.number,
+          sanskrit: currentVerse.sanskrit || "",
+          wordMeaning: currentVerse.wordMeaning || "",
+          translation: currentVerse.translation || "",
+          commentary: currentVerse.commentary || undefined
+        });
+      }
+
+      currentVerse = {
+        number: cleanNum,
+        sanskrit: text,
+        wordMeaning: "",
+        translation: "",
+        commentary: ""
+      };
+    } else {
+      if (inIntroduction) {
+        // Accumulate introduction paragraphs
+        const isIntroParagraph = className.includes("tat") || className.includes("txt") || className.includes("leading") || el.tagName === "P";
+        const isHeading = el.tagName === "H3" || el.tagName === "H4" || text.includes("Introduction") || text.includes("Book") || text.includes("Chapter");
+        
+        if (isIntroParagraph && !isHeading && text.length > 30) {
+          introduction += (introduction ? "\n" : "") + text;
+        }
+      } else if (currentVerse.number) {
+        // Append to current verse fields
+        if (className.includes("SanSloka")) {
+          currentVerse.sanskrit += "\n" + text;
+        } else if (className.includes("pratipada")) {
+          currentVerse.wordMeaning += (currentVerse.wordMeaning ? "\n" : "") + text;
+        } else if (className.includes("tat")) {
+          currentVerse.translation += (currentVerse.translation ? "\n" : "") + text;
+        } else if (className.includes("comment")) {
+          currentVerse.commentary += (currentVerse.commentary ? "\n" : "") + text;
+        } else {
+          // Fallback heuristics
+          if (/^\d+\.\s/.test(text) && text.includes("=")) {
+            currentVerse.wordMeaning += (currentVerse.wordMeaning ? "\n" : "") + text;
+          } else if (text.startsWith('"') || text.startsWith('"') || text.startsWith("\"")) {
+            currentVerse.translation += (currentVerse.translation ? "\n" : "") + text;
+          } else if (/^\[\d+-\d+-\d+\]/.test(text)) {
+            continue;
+          } else {
+            if (currentVerse.translation && text.length > 20) {
+              currentVerse.commentary += (currentVerse.commentary ? "\n" : "") + text;
+            } else if (!currentVerse.translation && text.length > 10) {
+              if (!devanagariPattern.test(text)) {
+                currentVerse.translation += (currentVerse.translation ? "\n" : "") + text;
+              }
+            }
+          }
+        }
+      }
     }
   }
 
-  // Flush the last verse
-  flushVerse();
-
-  // If element-based parsing didn't work well, try text-based parsing
-  if (verses.length === 0) {
-    const bodyText = body.text;
-    parseVersesFromText(bodyText, bookNum, sargaNum, verses);
-
-    // Try to get introduction from the beginning of text
-    if (!introduction) {
-      const firstVerseIdx = bodyText.search(/[\u0900-\u097F]{5,}/);
-      if (firstVerseIdx > 50) {
-        introduction = bodyText.substring(0, firstVerseIdx).trim()
-          .replace(/Verse Locator.*$/m, "")
-          .replace(/Book [IVX]+\s*:.*/m, "")
-          .replace(/Chapter \[Sarga\] \d+.*/m, "")
-          .replace(/Verses converted to.*/m, "")
-          .trim();
-      }
-    }
+  // Flush last verse (if any remained)
+  if (currentVerse.number && (currentVerse.sanskrit || currentVerse.translation)) {
+    verses.push({
+      number: currentVerse.number,
+      sanskrit: currentVerse.sanskrit || "",
+      wordMeaning: currentVerse.wordMeaning || "",
+      translation: currentVerse.translation || "",
+      commentary: currentVerse.commentary || undefined
+    });
   }
 
   return { introduction, verses };
-}
-
-/**
- * Fallback text-based verse parser.
- */
-function parseVersesFromText(text: string, bookNum: number, sargaNum: number, verses: Verse[]) {
-  // Split by verse number patterns like "|| 1-1-1" or "॥ १-१-१"
-  const versePattern = /([^\n]*[\u0900-\u097F][^\n]*[॥\|]{1,2}\s*(\d+-\d+-\d+)[^\n]*)/g;
-
-  let match;
-  const versePositions: { sanskrit: string; number: string; index: number }[] = [];
-
-  while ((match = versePattern.exec(text)) !== null) {
-    versePositions.push({
-      sanskrit: match[1].trim(),
-      number: match[2],
-      index: match.index
-    });
-  }
-
-  for (let i = 0; i < versePositions.length; i++) {
-    const vp = versePositions[i];
-    const nextIndex = i + 1 < versePositions.length ? versePositions[i + 1].index : text.length;
-    const betweenText = text.substring(vp.index + vp.sanskrit.length, nextIndex).trim();
-
-    // Extract word meaning (starts with number, contains =)
-    const wordMeaningMatch = betweenText.match(/^\d+\.\s[^"]+/);
-    const wordMeaning = wordMeaningMatch ? wordMeaningMatch[0].trim() : "";
-
-    // Extract translation (in quotes)
-    const translationMatch = betweenText.match(/"([^"]+)"/);
-    const translation = translationMatch ? translationMatch[1].trim() : "";
-
-    // Everything after translation is commentary
-    const commentaryStart = translationMatch
-      ? betweenText.indexOf(translationMatch[0]) + translationMatch[0].length
-      : (wordMeaningMatch ? wordMeaningMatch[0].length : 0);
-    const commentary = betweenText.substring(commentaryStart).trim()
-      .replace(/Verse Locator/g, "")
-      .replace(/https?:\/\/[^\s]+/g, "")
-      .trim();
-
-    verses.push({
-      number: vp.number,
-      sanskrit: vp.sanskrit,
-      wordMeaning: wordMeaning,
-      translation: translation,
-      commentary: commentary.length > 10 ? commentary : undefined
-    });
-  }
 }
 
 // ── Main Scraper ───────────────────────────────────────────────────────

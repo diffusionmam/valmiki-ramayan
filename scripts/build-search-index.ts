@@ -37,6 +37,7 @@ interface SearchEntry {
   sarga: number;
   sargaTitle: string;
   verseNumber: string;
+  verseIndex: number;
   sanskrit: string;
   translation: string;
 }
@@ -46,14 +47,15 @@ const OUTPUT = join(process.cwd(), "public", "search-index.json");
 
 function buildIndex() {
   const entries: SearchEntry[] = [];
-  const files = readdirSync(DATA_DIR).filter((f) => f.endsWith(".json"));
+  const files = readdirSync(DATA_DIR).filter((f) => f.endsWith(".json") && f !== "index.json");
 
   for (const file of files) {
     const raw = readFileSync(join(DATA_DIR, file), "utf-8");
     const kanda: KandaData = JSON.parse(raw);
 
     for (const sarga of kanda.sargas) {
-      for (const verse of sarga.verses) {
+      for (let i = 0; i < sarga.verses.length; i++) {
+        const verse = sarga.verses[i];
         // Skip empty verses
         if (!verse.sanskrit && !verse.translation) continue;
 
@@ -64,6 +66,7 @@ function buildIndex() {
           sarga: sarga.number,
           sargaTitle: sarga.title,
           verseNumber: verse.number,
+          verseIndex: i,
           // Truncate long fields to keep index size reasonable
           sanskrit: (verse.sanskrit || "").slice(0, 200),
           translation: (verse.translation || "").slice(0, 300),
