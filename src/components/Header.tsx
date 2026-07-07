@@ -8,13 +8,27 @@ import { KANDA_META, KANDA_SLUGS } from "@/lib/kanda-meta";
 import type { KandaSlug } from "@/lib/kanda-meta";
 import { KandaGlyph } from "@/components/KandaGlyph";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SearchModal } from "@/components/SearchModal";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [kandaOpen, setKandaOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const kandaRef = useRef<HTMLDivElement>(null);
+
+  // Cmd+k / Ctrl+k to open search
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Close the kanda dropdown on outside click or Escape.
   useEffect(() => {
@@ -125,6 +139,16 @@ export function Header() {
           </div>
 
           <Link
+            href="/journey/"
+            className={cn(
+              "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+              pathname === "/journey" && "bg-accent text-accent-foreground"
+            )}
+          >
+            Journey
+          </Link>
+
+          <Link
             href="/about/"
             className={cn(
               "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
@@ -145,11 +169,52 @@ export function Header() {
 
           <span className="mx-1 h-5 w-px bg-border" aria-hidden />
 
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-border/60 px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            aria-label="Search verses"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              suppressHydrationWarning
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <span className="hidden lg:inline">Search</span>
+            <kbd className="hidden rounded bg-muted px-1 font-mono text-[0.65rem] lg:inline">⌘K</kbd>
+          </button>
+
           <ThemeToggle />
         </nav>
 
         {/* Mobile controls */}
         <div className="flex items-center gap-1 md:hidden">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            aria-label="Search verses"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              suppressHydrationWarning
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </button>
           <ThemeToggle />
           <Button
             variant="ghost"
@@ -197,6 +262,13 @@ export function Header() {
               );
             })}
             <Link
+              href="/journey/"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+            >
+              Journey
+            </Link>
+            <Link
               href="/about/"
               onClick={() => setMobileOpen(false)}
               className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
@@ -213,6 +285,8 @@ export function Header() {
           </nav>
         </div>
       )}
+
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

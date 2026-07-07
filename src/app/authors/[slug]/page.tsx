@@ -6,6 +6,9 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AUTHORS, getKandaNameForAuthor } from "@/lib/authors";
 import { KANDA_META } from "@/lib/kanda-meta";
+import { KandaGlyph } from "@/components/KandaGlyph";
+import { Reveal } from "@/components/Reveal";
+import { cn } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -45,67 +48,78 @@ export default async function AuthorPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="mt-8">
-        <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-          {author.name}
-        </h1>
-        <Separator className="my-8 bg-saffron/20" />
-      </div>
+      <Reveal>
+        <div className="mt-8">
+          <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
+            {author.name}
+          </h1>
+          <Separator className="my-8 bg-saffron/20" />
+        </div>
+      </Reveal>
 
       <div className="prose-custom space-y-8">
-        <section className="space-y-4">
-          <div className="relative aspect-[5.6/1] overflow-hidden rounded-lg">
-            <Image
-              src={author.headerImage}
-              alt={`Header image for ${author.name}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 896px) 100vw, 896px"
-            />
-          </div>
-        </section>
-
-        <Card className="border-saffron/20 bg-saffron/5">
-          <CardHeader>
-            <CardTitle className="font-heading text-lg">Biography</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4 text-base leading-relaxed text-foreground/90">
-              {author.fullBio.split("\n\n").map((paragraph, idx) => (
-                <p key={idx}>{paragraph}</p>
-              ))}
+        <Reveal>
+          <section className="space-y-4">
+            <div className="relative aspect-[5.6/1] overflow-hidden rounded-lg">
+              <Image
+                src={author.headerImage}
+                alt={`Header image for ${author.name}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 896px) 100vw, 896px"
+              />
             </div>
-          </CardContent>
-        </Card>
+          </section>
+        </Reveal>
 
-        <section className="space-y-4">
-          <h2 className="font-heading text-xl font-semibold text-foreground">
-            Translated Kandas
-          </h2>
-          <div className="grid gap-3">
-            {author.translatedKandas.map((kandaSlug) => {
-              const kandaMeta = KANDA_META[kandaSlug];
-              const kandaName = translatedKandaNames[kandaSlug];
-              return (
-                <a
-                  key={kandaSlug}
-                  href={`/kanda/${kandaSlug}/`}
-                  className="flex items-start gap-3 rounded-lg border border-border/50 p-4 transition-all hover:border-saffron/30 hover:bg-accent/50"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                    {kandaMeta?.bookNumber || "?"}
-                  </span>
-                  <div>
-                    <p className="font-medium text-foreground">{kandaName}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {kandaMeta?.nameEnglish} — {kandaMeta?.sargaCount} chapters
-                    </p>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </section>
+        <Reveal>
+          <Card className="border-saffron/20 bg-saffron/5">
+            <CardHeader>
+              <CardTitle className="font-heading text-lg">Biography</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 text-base leading-relaxed text-foreground/90">
+                {author.fullBio.split("\n\n").map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </Reveal>
+
+        <Reveal>
+          <section className="space-y-4">
+            <h2 className="font-heading text-xl font-semibold text-foreground">
+              Translated Kandas
+            </h2>
+            <div className="grid gap-3">
+              {author.translatedKandas.map((kandaSlug) => {
+                const kandaMeta = KANDA_META[kandaSlug];
+                const kandaName = translatedKandaNames[kandaSlug];
+                return (
+                  <a
+                    key={kandaSlug}
+                    href={`/kanda/${kandaSlug}/`}
+                    className={cn(
+                      "flex items-start gap-3 rounded-lg border border-border/50 p-4 transition-all hover:border-saffron/30 hover:bg-accent/50",
+                      `kanda-${kandaSlug}`
+                    )}
+                  >
+                    <span className="kanda-glyph-color flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-saffron/10">
+                      <KandaGlyph name={kandaMeta?.glyph ?? "bow"} className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <p className="font-medium text-foreground">{kandaName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {kandaMeta?.nameEnglish} — {kandaMeta?.sargaCount} chapters
+                      </p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        </Reveal>
 
         <Card className="border-saffron/20 bg-saffron/5">
           <CardContent className="p-6">

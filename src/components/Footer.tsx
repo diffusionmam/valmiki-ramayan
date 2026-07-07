@@ -29,6 +29,14 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
+                  href="/journey/"
+                  className="text-sm text-foreground/80 transition-colors hover:text-primary"
+                >
+                  The Journey
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/about/"
                   className="text-sm text-foreground/80 transition-colors hover:text-primary"
                 >

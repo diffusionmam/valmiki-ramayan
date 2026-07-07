@@ -103,7 +103,7 @@ export function SargaReader({
   return (
     <>
       <ReadingProgress />
-      <div className="flex gap-8">
+      <div className="flex flex-col gap-0 xl:flex-row xl:gap-8">
         <SargaRail
           kandaSlug={kandaSlug}
           kandaName={kandaName}

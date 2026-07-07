@@ -143,10 +143,14 @@
     @apply bg-background text-foreground;
     /* Anchor jumps clear the sticky header. */
     scroll-padding-top: 5rem;
+    /* Prevent horizontal scroll from SVG or long text. */
+    overflow-x: hidden;
   }
   html {
     @apply font-sans scroll-smooth;
     scroll-padding-top: 5rem;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
   /* Ensure in-page anchors land below the sticky header. */
   [id] {
@@ -173,10 +177,16 @@ body::before {
 /* ── Sanskrit Verse Typography ───────────────────────────────── */
 .verse-sanskrit {
   font-family: "Noto Serif Devanagari", "Noto Serif", Georgia, serif;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   line-height: 2.1;
   letter-spacing: 0.025em;
   color: var(--saffron-dark);
+  word-break: break-word;
+}
+@media (min-width: 640px) {
+  .verse-sanskrit {
+    font-size: 1.3rem;
+  }
 }
 
 .dark .verse-sanskrit {
@@ -349,6 +359,17 @@ body::before {
   transition: none;
 }
 
+/* ── Prose Custom (lightweight prose wrapper) ────────────────── */
+.prose-custom {
+  max-width: 65ch;
+}
+.prose-custom p {
+  line-height: 1.8;
+}
+.prose-custom section {
+  scroll-margin-top: 5rem;
+}
+
 /* ── SargaRail ───────────────────────────────────────────────── */
 .sarga-rail {
   position: sticky;
@@ -365,6 +386,18 @@ body::before {
 .rail-verse-link.active {
   color: var(--kanda-accent, var(--saffron));
   font-weight: 600;
+}
+
+/* ── Journey Map ─────────────────────────────────────────────── */
+.journey-map-container {
+  min-height: 400px;
+  aspect-ratio: 10 / 7;
+}
+.journey-map-container svg text {
+  user-select: none;
+}
+.journey-panel {
+  scroll-margin-top: 5rem;
 }
 
 /* ── Kaanda Accent System ────────────────────────────────────── */

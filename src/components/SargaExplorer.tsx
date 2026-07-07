@@ -171,12 +171,12 @@ export function SargaExplorer({ kandaSlug, sargas, arcs }: SargaExplorerProps) {
                     >
                       <path d="m9 18 6-6-6-6" />
                     </svg>
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <h3 className="font-heading text-sm font-semibold text-foreground">
                         {arcName}
                       </h3>
                       {group.arc && (
-                        <p className="mt-0.5 text-xs text-muted-foreground">
+                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
                           {group.arc.description}
                         </p>
                       )}
@@ -184,11 +184,12 @@ export function SargaExplorer({ kandaSlug, sargas, arcs }: SargaExplorerProps) {
                   </div>
                   <div className="shrink-0 text-right text-xs text-muted-foreground">
                     {group.arc && (
-                      <span className="mr-3 text-muted-foreground/60">
+                      <span className="mr-3 hidden text-muted-foreground/60 sm:inline">
                         Sargas {group.arc.start}–{group.arc.end}
                       </span>
                     )}
-                    {sargaCount} chapters · {verseCount.toLocaleString()} verses
+                    <span className="hidden sm:inline">{sargaCount} chapters · {verseCount.toLocaleString()} verses</span>
+                    <span className="sm:hidden">{sargaCount} ch.</span>
                   </div>
                 </button>
 
