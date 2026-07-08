@@ -21,7 +21,7 @@ export default function JourneyPage() {
           <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
             The Journey
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground italic">
+          <p className="mt-2 text-lg text-foreground/60 italic">
             From Ayodhya to Lanka — the path of exile, search, and return
           </p>
           <Separator className="my-8 bg-saffron/20" />
@@ -29,7 +29,7 @@ export default function JourneyPage() {
       </Reveal>
 
       <Reveal>
-        <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
+        <p className="mb-8 max-w-2xl text-base leading-relaxed text-foreground/80">
           Follow Rama&apos;s journey across the Indian subcontinent as it was
           known in the Treta Yuga — from his birthplace in Ayodhya on the Sarayu
           river, through the forests of Dandaka, to the monkey kingdom of
@@ -46,7 +46,7 @@ export default function JourneyPage() {
       <Ornament variant="lotus" divider className="my-12 max-w-xs" />
 
       <Reveal>
-        <p className="text-center text-sm text-muted-foreground/60">
+        <p className="text-center text-sm text-foreground/50">
           The route is approximate, based on the geographical references in
           Valmiki&apos;s Ramayana. Place names follow the traditional
           identification of sites.

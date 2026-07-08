@@ -130,7 +130,7 @@ export default function GalleryPage() {
           <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
             Ramayana in Art
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground italic">
+          <p className="mt-2 text-lg text-foreground/60 italic">
             A visual journey through the epic by Bapu
           </p>
           <Separator className="my-8 bg-saffron/20" />
@@ -144,7 +144,7 @@ export default function GalleryPage() {
             <h2 className="font-heading text-xl font-semibold text-foreground">
               The Panorama
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground/60">
               Click to open the fullscreen viewer — scroll to zoom, drag to pan.
             </p>
             <GalleryLightbox
@@ -180,12 +180,12 @@ export default function GalleryPage() {
                       <span className="mt-1 inline-flex items-center rounded-full bg-saffron/10 px-2 py-0.5 text-xs font-medium kanda-glyph-color">
                         {event.kanda}
                       </span>
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 text-sm text-foreground/70">
                         {event.description}
                       </p>
                       <Link
                         href={`/kanda/${event.kandaSlug}/sarga/${event.sarga}/`}
-                        className="mt-3 inline-block text-xs text-muted-foreground underline underline-offset-2 transition-colors hover:text-primary"
+                        className="mt-3 inline-block text-xs text-foreground/60 underline underline-offset-2 transition-colors hover:text-primary"
                       >
                         Read Sarga {event.sarga} →
                       </Link>
@@ -203,7 +203,7 @@ export default function GalleryPage() {
             <h2 className="font-heading text-xl font-semibold text-foreground">
               Themed Exhibits
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-foreground/60">
               Five pivotal moments, each a doorway into the epic.
             </p>
             <Ornament variant="lotus" divider className="max-w-xs" />
@@ -225,7 +225,7 @@ export default function GalleryPage() {
                     <h3 className="font-heading text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                       {exhibit.name}
                     </h3>
-                    <p className="mt-2 flex-1 text-xs leading-relaxed text-muted-foreground">
+                    <p className="mt-2 flex-1 text-xs leading-relaxed text-foreground/65">
                       {exhibit.description}
                     </p>
                   </Link>
@@ -239,7 +239,7 @@ export default function GalleryPage() {
         <Reveal>
           <Card className="border-saffron/20 bg-saffron/5">
             <CardContent className="p-6">
-              <p className="text-center text-sm text-muted-foreground">
+              <p className="text-center text-sm text-foreground/70">
                 Artwork by{" "}
                 <a
                   href="http://www.icpl.com/bapu/about.htm"

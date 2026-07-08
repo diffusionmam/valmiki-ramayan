@@ -28,7 +28,7 @@ export default function AuthorsIndexPage() {
           <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
             Translators
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground italic">
+          <p className="mt-2 text-lg text-foreground/60 italic">
             The scholars who brought this epic to life
           </p>
           <Separator className="my-8 bg-saffron/20" />
@@ -62,7 +62,7 @@ export default function AuthorsIndexPage() {
                     </div>
                   </div>
 
-                  <p className="line-clamp-3 text-sm text-muted-foreground">
+                  <p className="line-clamp-3 text-sm text-foreground/70">
                     {author.shortBio}
                   </p>
 

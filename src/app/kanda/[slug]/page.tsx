@@ -64,13 +64,13 @@ export default async function KandaPage({ params }: KandaPageProps) {
                 <p className="mt-1 font-heading text-lg text-muted-foreground/70">
                   {meta.nameDevanagari}
                 </p>
-                <p className="mt-1 text-lg italic text-muted-foreground">
+                <p className="mt-1 text-lg italic text-foreground/60">
                   {meta.nameEnglish}
                 </p>
               </div>
             </div>
 
-            <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-3xl text-base leading-relaxed text-foreground/80">
               {meta.description}
             </p>
 
@@ -111,7 +111,7 @@ export default async function KandaPage({ params }: KandaPageProps) {
               <h2 className="font-heading text-xl font-semibold text-foreground sm:text-2xl">
                 {meta.name} in One Breath
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-foreground/60">
                 The pivotal moments that define this book.
               </p>
             </Reveal>
@@ -129,10 +129,10 @@ export default async function KandaPage({ params }: KandaPageProps) {
                     <h3 className="font-heading text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                       {moment.title}
                     </h3>
-                    <p className="mt-2 flex-1 text-xs leading-relaxed text-muted-foreground">
+                    <p className="mt-2 flex-1 text-xs leading-relaxed text-foreground/65">
                       {moment.description}
                     </p>
-                    <p className="mt-3 text-xs text-muted-foreground/60">
+                    <p className="mt-3 text-xs text-foreground/55">
                       Sarga {moment.sarga} →
                     </p>
                   </Link>
@@ -150,7 +150,7 @@ export default async function KandaPage({ params }: KandaPageProps) {
             <h2 className="font-heading text-2xl font-bold text-foreground">
               Chapters (Sargas)
             </h2>
-            <p className="mt-2 text-muted-foreground">
+            <p className="mt-2 text-foreground/60">
               {sargas.length} chapters, grouped into narrative arcs.
             </p>
             <Ornament variant="diamond" divider className="mx-auto mt-4 max-w-xs" />

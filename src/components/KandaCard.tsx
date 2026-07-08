@@ -77,10 +77,10 @@ export function KandaCard({
             </CardDescription>
           </CardHeader>
           <CardContent className="relative">
-            <p className="mb-3 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+            <p className="mb-3 text-sm leading-relaxed text-foreground/70 line-clamp-3">
               {description}
             </p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-foreground/60">
               <svg
                 width="14"
                 height="14"

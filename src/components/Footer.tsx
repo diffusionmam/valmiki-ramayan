@@ -15,7 +15,7 @@ export function Footer() {
                 Valmiki Ramayana
               </span>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-foreground/70">
               A modern presentation of the ancient Sanskrit epic, Srimad Valmiki
               Ramayana — 24,000 verses across 6 Kaandas.
             </p>
@@ -75,7 +75,7 @@ export function Footer() {
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Credits
             </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-foreground/70">
               Translation by Sri Desiraju Hanumanta Rao &amp; Sri K. M. K.
               Murthy. Original content from{" "}
               <a
