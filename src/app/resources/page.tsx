@@ -135,7 +135,7 @@ export default function ResourcesPage() {
           <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
             Resources
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground">
+          <p className="mt-2 text-lg text-foreground/60">
             Commentaries, translations, and references for studying the Ramayana
           </p>
           <Separator className="my-8 bg-saffron/20" />
@@ -177,7 +177,7 @@ export default function ResourcesPage() {
                         <p className="font-medium text-foreground group-hover:text-primary transition-colors">
                           {resource.title}
                         </p>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-foreground/70">
                           {resource.desc}
                         </p>
                       </div>

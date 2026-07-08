@@ -156,6 +156,13 @@
   [id] {
     scroll-margin-top: 5rem;
   }
+  /* Balanced line lengths for headings; pretty orphans for prose. */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  .prose-custom p {
+    text-wrap: pretty;
+  }
 }
 
 /* ── Paper-grain texture (site-wide, dependency-free) ────────── */
@@ -213,7 +220,7 @@ body::before {
 
 .verse-meaning {
   font-style: italic;
-  color: var(--muted-foreground);
+  color: color-mix(in oklch, var(--foreground) 72%, var(--background));
   line-height: 1.8;
 }
 
@@ -228,7 +235,7 @@ body::before {
   font-size: 1rem;
   line-height: 1.9;
   letter-spacing: 0.01em;
-  color: var(--muted-foreground);
+  color: color-mix(in oklch, var(--foreground) 65%, var(--background));
   font-style: italic;
   white-space: pre-line;
   text-align: center;
@@ -236,8 +243,7 @@ body::before {
 }
 
 .dark .verse-itrans {
-  color: var(--muted-foreground);
-  opacity: 0.85;
+  color: color-mix(in oklch, var(--foreground) 70%, var(--background));
 }
 
 /* ── Manuscript Plaque ───────────────────────────────────────── */
@@ -309,12 +315,12 @@ body::before {
 .commentary-body {
   margin-top: 0.6rem;
   padding: 0.85rem 1rem;
-  border-left: 2px solid var(--saffron);
-  border-radius: 0 0.5rem 0.5rem 0;
+  border: 1px solid color-mix(in oklch, var(--saffron) 20%, transparent);
+  border-radius: 0.5rem;
   background: color-mix(in oklch, var(--saffron) 4%, transparent);
   font-size: 0.85rem;
   line-height: 1.75;
-  color: var(--muted-foreground);
+  color: color-mix(in oklch, var(--foreground) 72%, var(--background));
 }
 
 /* ── Verse section label ─────────────────────────────────────── */
@@ -341,16 +347,12 @@ body::before {
 /* ── Reading Progress Bar ────────────────────────────────────── */
 .reading-progress {
   position: fixed;
-  top: 4rem; /* below the 4rem (h-16) sticky header */
+  top: 0; /* pinned to the browser top, overlaying the header edge */
   left: 0;
   height: 3px;
   z-index: 60; /* above the z-50 header */
-  background: linear-gradient(
-    to right,
-    var(--saffron-dark),
-    var(--saffron)
-  );
-  box-shadow: 0 1px 4px oklch(0.72 0.16 65 / 30%);
+  background: var(--kanda-accent, var(--saffron));
+  box-shadow: 0 1px 4px color-mix(in oklch, var(--kanda-accent, var(--saffron)) 35%, transparent);
   transition: width 0.1s linear;
   will-change: width;
   border-radius: 0 2px 2px 0;
@@ -504,6 +506,44 @@ body::before {
 .hero-gradient[data-kanda="kishkindha"] { --hero-glow: oklch(0.58 0.12 55 / 18%); }
 .hero-gradient[data-kanda="sundara"] { --hero-glow: oklch(0.55 0.12 210 / 16%); }
 .hero-gradient[data-kanda="yuddha"] { --hero-glow: oklch(0.52 0.18 25 / 18%); }
+
+/* ── Hero Image Overlay ──────────────────────────────────────── */
+/* Warm-tinted overlay that blends with the hero image's own      */
+/* ochre/saffron palette and fades into the page ground at the    */
+/* bottom edge — no hard seam between hero and page.              */
+.hero-image-overlay {
+  background: linear-gradient(
+    180deg,
+    oklch(0.14 0.04 50 / 0.55) 0%,
+    oklch(0.12 0.05 50 / 0.68) 40%,
+    oklch(0.12 0.05 50 / 0.55) 70%,
+    oklch(0.98 0.008 75 / 0.45) 100%
+  );
+}
+.dark .hero-image-overlay {
+  background: linear-gradient(
+    180deg,
+    oklch(0.08 0.025 50 / 0.72) 0%,
+    oklch(0.06 0.03 50 / 0.82) 40%,
+    oklch(0.06 0.03 50 / 0.72) 70%,
+    oklch(0.14 0.015 40 / 0.55) 100%
+  );
+}
+
+/* ── Hero Image Zoom (scroll-linked, GPU-accelerated) ────────── */
+.hero-zoom-image {
+  transform: scale(var(--hero-zoom, 1.08));
+  transform-origin: center 40%;
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-zoom-image {
+    transform: scale(1.05);
+    transition: none;
+    will-change: auto;
+  }
+}
 
 /* ── On-scroll Reveal (dependency-free) ──────────────────────── */
 .reveal {

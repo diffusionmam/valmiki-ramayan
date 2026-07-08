@@ -25,7 +25,7 @@ export default function AboutPage() {
           <h1 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
             About the Ramayana
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground italic">
+          <p className="mt-2 text-lg text-foreground/60 italic">
             The timeless journey of virtue
           </p>
           <Separator className="my-8 bg-saffron/20" />
@@ -99,7 +99,7 @@ export default function AboutPage() {
                           ({book.nameEnglish})
                         </span>
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-foreground/70">
                         {book.sargaCount} chapters — {book.description}
                       </p>
                     </div>
@@ -137,7 +137,7 @@ export default function AboutPage() {
                 lokaabhiraamam shriiraamam bhuuyo bhuuyo namaamyaham
               </p>
               <Ornament variant="diamond" divider className="mx-auto my-4 max-w-[120px]" />
-              <p className="text-sm italic text-muted-foreground">
+              <p className="text-sm italic text-foreground/70">
                 &ldquo;I bow again and again to Sri Rama Who removes all
                 obstacles, grants all wealth and pleases all.&rdquo;
               </p>

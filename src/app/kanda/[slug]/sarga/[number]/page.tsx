@@ -90,7 +90,7 @@ export default async function SargaPage({ params }: SargaPageProps) {
             <Separator className="my-5 bg-saffron/20" />
             <div className="rounded-xl border border-border/50 bg-card p-5">
               <p className="verse-label mb-2">Introduction</p>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/75">
                 {sarga.introduction}
               </p>
             </div>
@@ -115,10 +115,10 @@ export default async function SargaPage({ params }: SargaPageProps) {
         />
       ) : (
         <div className="rounded-xl border border-border/50 bg-card p-12 text-center">
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-foreground/70">
             Verse data for this chapter is not yet available.
           </p>
-          <p className="mt-2 text-sm text-muted-foreground/60">
+          <p className="mt-2 text-sm text-foreground/55">
             Please check back later or visit the{" "}
             <a
               href="https://valmikiramayan.net"
