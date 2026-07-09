@@ -51,6 +51,7 @@ async function loadSearchIndex(): Promise<{ search: (q: string) => SearchEntry[]
           prefix: true,
           fuzzy: 0.2,
           boost: { translation: 2, sanskrit: 1.5 },
+          combineWith: "AND",
         },
       });
 

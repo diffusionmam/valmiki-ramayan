@@ -10,7 +10,7 @@ import { HeroZoom } from "@/components/HeroZoom";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col font-flaviotte">
+    <div className="flex flex-col font-inter">
       {/* Hero Section — image-backed with warm overlay for readability */}
       <section className="relative overflow-hidden border-b border-border/40">
         {/* Background image — scoped to this section only.
@@ -31,7 +31,7 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="animate-fade-up font-heading text-lg text-saffron sm:text-xl">
+            <p className="animate-fade-up font-inter text-lg text-saffron sm:text-xl">
               श्रीमद्वाल्मीकीयरामायणम्
             </p>
             <h1 className="animate-fade-up-delay-1 mt-4 font-migra text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
@@ -49,10 +49,11 @@ export default function HomePage() {
               className="mx-auto mt-8 max-w-xs animate-fade-up-delay-3"
             />
 
-            <p className="animate-fade-up-delay-3 mt-4 text-sm text-white/70 font-sans">
+            <p className="animate-fade-up-delay-3 mt-4 text-sm italic text-white/70">
               &ldquo;aapadaam apahartaaram daataaram sarvasaMpadaam —{" "}
               <br />
-              I bow again and again to Sri Rama who removes all obstacles and grants all wealth.&rdquo;
+              I bow again and again to Sri Rama who removes all obstacles and
+              grants all wealth.&rdquo;
             </p>
 
             {/* CTA — saffron glows against the warm overlay */}
@@ -83,7 +84,7 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <Reveal>
           <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+            <h2 className="font-inter text-2xl font-bold text-foreground sm:text-3xl">
               The Six Kaandas
             </h2>
             <p className="mt-2 text-foreground/70">
@@ -119,7 +120,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <Reveal>
             <div className="mx-auto max-w-3xl text-center">
-              <h2 className="text-2xl font-bold text-foreground">
+              <h2 className="font-inter text-2xl font-bold text-foreground">
                 About This Project
               </h2>
               <Separator className="mx-auto my-6 max-w-[80px] bg-saffron/40" />

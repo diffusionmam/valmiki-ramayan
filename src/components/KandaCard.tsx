@@ -66,11 +66,11 @@ export function KandaCard({
                 Book {bookNumber}
               </Badge>
             </div>
-            <CardTitle className="font-heading text-xl group-hover:text-primary transition-colors">
+            <CardTitle className="font-inter text-xl group-hover:text-primary transition-colors">
               {name}
             </CardTitle>
             <CardDescription className="space-y-0.5">
-              <span className="block font-heading text-sm text-muted-foreground/70">
+              <span className="block font-inter text-sm text-muted-foreground/70">
                 {nameDevanagari}
               </span>
               <span className="block text-sm italic">{nameEnglish}</span>

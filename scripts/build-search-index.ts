@@ -60,7 +60,10 @@ function buildIndex() {
         if (!verse.sanskrit && !verse.translation) continue;
 
         entries.push({
-          id: `${kanda.slug}-${sarga.number}-${verse.number}`,
+          // Verse numbers can legitimately repeat within a sarga (e.g. split
+          // verses share the same number), so fold in the array index to keep
+          // the id unique across the whole index.
+          id: `${kanda.slug}-${sarga.number}-${i}-${verse.number}`,
           kanda: kanda.slug,
           kandaName: kanda.name,
           sarga: sarga.number,
