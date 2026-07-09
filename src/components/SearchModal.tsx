@@ -51,7 +51,6 @@ async function loadSearchIndex(): Promise<{ search: (q: string) => SearchEntry[]
           prefix: true,
           fuzzy: 0.2,
           boost: { translation: 2, sanskrit: 1.5 },
-          combineWith: "AND",
         },
       });
 
@@ -94,6 +93,16 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     }
   }, [open, loaded]);
 
+  // Close on Escape regardless of where focus lives.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") handleClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, handleClose]);
+
   // Perform search on query change
   const doSearch = useCallback(
     async (q: string) => {
@@ -103,7 +112,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
       }
       const ms = await loadSearchIndex();
       if (!ms) return;
-      const hits = ms.search(q).slice(0, 20) as SearchEntry[];
+      const hits = ms.search(q) as SearchEntry[];
       setResults(hits);
       setActiveIndex(0);
     },
