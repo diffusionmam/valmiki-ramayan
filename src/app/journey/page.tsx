@@ -6,7 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { JourneyMap } from "@/components/JourneyMap";
 
 export const metadata: Metadata = {
-  title: "The Journey",
+  title: "Rama's Journey — Ayodhya to Lanka",
   description:
     "Trace the Ramayan route from Ayodhya to Lanka — the path of Rama's exile, search, war, and return.",
 };
@@ -29,18 +29,28 @@ export default function JourneyPage() {
       </Reveal>
 
       <Reveal>
-        <p className="mb-8 max-w-2xl text-base leading-relaxed text-foreground/80">
-          Follow Rama&apos;s journey across the Indian subcontinent as it was
-          known in the Treta Yuga — from his birthplace in Ayodhya on the Sarayu
-          river, through the forests of Dandaka, to the monkey kingdom of
-          Kishkindha, across the ocean bridge to Lanka, and back. Click any
-          waypoint on the map to read the relevant chapter.
-        </p>
+        <section className="space-y-4">
+          <h2 className="font-heading text-xl font-semibold text-foreground">
+            Route Overview
+          </h2>
+          <p className="max-w-2xl text-base leading-relaxed text-foreground/80">
+            Follow Rama&apos;s journey across the Indian subcontinent as it was
+            known in the Treta Yuga — from his birthplace in Ayodhya on the Sarayu
+            river, through the forests of Dandaka, to the monkey kingdom of
+            Kishkindha, across the ocean bridge to Lanka, and back. Click any
+            waypoint on the map to read the relevant chapter.
+          </p>
+        </section>
       </Reveal>
 
       {/* Interactive map + side panel */}
       <Reveal>
-        <JourneyMap />
+        <section className="space-y-4">
+          <h2 className="font-heading text-xl font-semibold text-foreground">
+            Interactive Map
+          </h2>
+          <JourneyMap />
+        </section>
       </Reveal>
 
       <Ornament variant="lotus" divider className="my-12 max-w-xs" />

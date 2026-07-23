@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import type { KandaSlug, KandaGlyphName } from "@/lib/kanda-meta";
 
 export const metadata: Metadata = {
-  title: "Gallery",
+  title: "Ramayana in Art — Gallery",
   description:
     "Ramayana in art by Bapu — a visual journey through the epic depicting key events from Bala Kanda to the coronation of Sri Rama.",
 };

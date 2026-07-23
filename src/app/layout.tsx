@@ -31,8 +31,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://valmiki-ramayan.vercel.app"),
   title: {
-    default: "Srimad Valmiki Ramayana — Sanskrit Epic with English Translation",
+    default: "Srimad Valmiki Ramayana — Sanskrit Epic",
     template: "%s | Valmiki Ramayana",
   },
   description:
