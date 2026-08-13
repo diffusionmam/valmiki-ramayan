@@ -3,6 +3,7 @@ import { Geist_Mono } from "next/font/google";
 import { Noto_Serif_Devanagari, Inter } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // Apply the stored theme before paint to avoid a flash of incorrect theme.
@@ -88,6 +89,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
